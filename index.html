@@ -8,15 +8,28 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
+        /* 🌓 기본 라이트 모드 / 다크 모드 CSS 변수 설정 */
         :root {
-            --primary: #4f46e5;
-            --primary-dark: #1e1b4b;
             --bg: #f8fafc;
             --card-bg: #ffffff;
             --text: #1e293b;
             --text-muted: #64748b;
             --border: #e2e8f0;
+            --primary: #4f46e5;
+            --primary-dark: #1e1b4b;
             --star-color: #f59e0b;
+            --dashboard-bg: #f1f5f9;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --primary: #818cf8;
+            --primary-dark: #c7d2fe;
+            --dashboard-bg: #334155;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -27,90 +40,59 @@
             line-height: 1.6;
             word-break: keep-all;
             padding-bottom: 5rem;
+            transition: background-color 0.3s, color 0.3s;
         }
+
+        /* 🔒 4. 암호 잠금 화면 스타일 */
+        #lock-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;
+        }
+        .pin-box { background: rgba(255,255,255,0.1); padding: 2rem; border-radius: 20px; text-align: center; max-width: 320px; width: 90%; }
+        .pin-input { width: 100%; text-align: center; font-size: 1.8rem; letter-spacing: 0.5rem; padding: 0.5rem; border-radius: 10px; border: none; margin: 1.5rem 0; color: #1e1b4b; }
 
         header {
             background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4f46e5 100%);
-            color: white;
-            text-align: center;
-            padding: 2.5rem 1rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            color: white; text-align: center; padding: 2rem 1rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            position: relative;
         }
         header h1 { font-size: 1.8rem; font-weight: 700; }
 
+        /* 🌓 1. 다크모드 & 백업 상단 유틸 바 */
+        .util-bar { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: var(--card-bg); border-bottom: 1px solid var(--border); }
+        .util-left { display: flex; gap: 0.5rem; }
+        .util-btn { padding: 0.4rem 0.75rem; font-size: 0.85rem; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); cursor: pointer; font-weight: 500; }
+
         .container { max-width: 800px; margin: 1.5rem auto; padding: 0 1rem; }
 
-        .tab-menu {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-            padding: 0.4rem;
-            border-radius: 12px;
-            background-color: #e2e8f0;
+        /* 📊 2. 통계 대시보드 인테리어 */
+        .dashboard {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.5rem;
+            background: var(--dashboard-bg); padding: 1rem; border-radius: 16px;
         }
-        .tab-btn {
-            flex: 1;
-            padding: 0.85rem;
-            border: none;
-            background: none;
-            color: var(--text-muted);
-            font-weight: 500;
-            font-size: 1rem;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
-        .tab-btn.active {
-            background: var(--card-bg);
-            color: var(--primary);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            font-weight: 700;
-        }
+        .dash-card { background: var(--card-bg); padding: 0.75rem 1rem; border-radius: 12px; border: 1px solid var(--border); }
+        .dash-title { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.25rem; }
+        .dash-val { font-size: 1.25rem; font-weight: 700; color: var(--primary); }
+        .progress-bar-container { background: #e2e8f0; height: 8px; border-radius: 4px; margin-top: 0.5rem; overflow: hidden; }
+        .progress-bar { background: #22c55e; height: 100%; width: 0%; transition: width 0.4s; }
 
-        .card {
-            background: var(--card-bg);
-            padding: 1.75rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.03);
-            border: 1px solid var(--border);
-            margin-bottom: 1.5rem;
-        }
+        .tab-menu { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; padding: 0.4rem; border-radius: 12px; background-color: var(--dashboard-bg); }
+        .tab-btn { flex: 1; padding: 0.85rem; border: none; background: none; color: var(--text-muted); font-weight: 500; font-size: 1rem; cursor: pointer; border-radius: 8px; transition: all 0.2s; }
+        .tab-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); font-weight: 700; }
 
+        .card { background: var(--card-bg); padding: 1.75rem; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.03); border: 1px solid var(--border); margin-bottom: 1.5rem; }
         .form-group { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 0.5rem; }
         .row-group { display: flex; flex-direction: column; gap: 0.5rem; }
         
-        input, select, textarea {
-            width: 100%; 
-            padding: 0.95rem; 
-            border: 2px solid var(--border); 
-            border-radius: 12px;
-            font-family: inherit; 
-            font-size: 1.05rem; 
-            color: var(--text);
-            background-color: #fff;
-            transition: border-color 0.2s;
-        }
+        input, select, textarea { width: 100%; padding: 0.95rem; border: 2px solid var(--border); border-radius: 12px; font-family: inherit; font-size: 1.05rem; color: var(--text); background-color: var(--card-bg); transition: border-color 0.2s; }
         input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
         textarea { height: 120px; resize: none; }
-        
-        .label-text {
-            font-size: 0.95rem; 
-            font-weight: 700; 
-            color: var(--primary-dark);
-            margin-bottom: 0.25rem;
-        }
+        .label-text { font-size: 0.95rem; font-weight: 700; color: var(--primary); margin-bottom: 0.25rem; }
 
-        button.main-btn {
-            width: 100%; padding: 1rem; border: none; border-radius: 12px;
-            background: var(--primary); color: white; font-size: 1.1rem; font-weight: 700; cursor: pointer;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
-        }
+        button.main-btn { width: 100%; padding: 1rem; border: none; border-radius: 12px; background: var(--primary); color: white; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
         button.main-btn:hover { background: #3730a3; }
-        
-        .cancel-btn {
-            width: 100%; padding: 0.75rem; border: none; border-radius: 12px;
-            background: #94a3b8; color: white; font-size: 1rem; font-weight: 500; cursor: pointer; margin-top: -0.5rem;
-        }
+        .cancel-btn { width: 100%; padding: 0.75rem; border: none; border-radius: 12px; background: #94a3b8; color: white; font-size: 1rem; font-weight: 500; cursor: pointer; margin-top: -0.5rem; }
 
         .filter-bar { display: flex; justify-content: flex-end; margin-bottom: 1.25rem; }
         .filter-bar label { display: flex; align-items: center; gap: 0.5rem; font-size: 1rem; color: var(--text); font-weight: 500; cursor: pointer; }
@@ -118,48 +100,37 @@
 
         .list-container { display: flex; flex-direction: column; gap: 1.25rem; }
         
-        /* 피드형 아이템 디자인 수정 버튼 공간 확보 */
-        .feed-item {
-            background: white; padding: 1.5rem; border-radius: 16px; border: 1px solid var(--border);
-            position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-        }
+        .feed-item { background: var(--card-bg); padding: 1.5rem; border-radius: 16px; border: 1px solid var(--border); position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
         .feed-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
-        .feed-meta { font-size: 0.85rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; border-top: 1px solid #f1f5f9; padding-top: 0.75rem; }
+        .feed-meta { font-size: 0.85rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 0.75rem; }
         
         .badge { padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.8rem; font-weight: 700; display: inline-block; margin-bottom: 0.25rem; }
         .badge.기억 { background: #e0f2fe; color: #0369a1; }
         .badge.잡생각 { background: #f1f5f9; color: #475569; }
         .badge.하고싶은것 { background: #fef3c7; color: #b45309; }
         
-        .feed-title { font-size: 1.2rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 0.5rem; }
-        .feed-body { font-size: 1.05rem; color: #334155; white-space: pre-wrap; }
+        .feed-title { font-size: 1.2rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem; }
+        .feed-body { font-size: 1.05rem; color: var(--text); white-space: pre-wrap; }
         
-        /* 트리형 목표 스타일 */
-        .goal-tree-item {
-            background: #fff; border: 1px solid var(--border); border-radius: 20px; padding: 1.5rem;
-            border-left: 6px solid var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-        }
-        .goal-tree-item.completed { border-left-color: #22c55e; background: #f0fdf4; }
+        .goal-tree-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 1.5rem; border-left: 6px solid var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .goal-tree-item.completed { border-left-color: #22c55e; background: rgba(34, 197, 94, 0.05); }
         .goal-tree-item.completed .main-goal-text { text-decoration: line-through; color: var(--text-muted); }
         
         .goal-main-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; margin-bottom: 1rem; }
         .goal-main-left { display: flex; align-items: flex-start; gap: 0.85rem; width: 85%; }
         .goal-main-left input[type="checkbox"] { width: 1.4rem; height: 1.4rem; margin-top: 0.2rem; accent-color: #22c55e; cursor: pointer; }
-        .main-goal-text { font-weight: 700; font-size: 1.25rem; color: var(--primary-dark); line-height: 1.4; }
-        .goal-date { display: inline-block; font-size: 0.85rem; color: #ef4444; font-weight: 700; background: #fef2f2; padding: 0.1rem 0.5rem; border-radius: 6px; margin-left: 0.5rem; }
+        .main-goal-text { font-weight: 700; font-size: 1.25rem; color: var(--text); line-height: 1.4; }
+        .goal-date { display: inline-block; font-size: 0.85rem; color: #ef4444; font-weight: 700; background: rgba(239, 68, 68, 0.1); padding: 0.1rem 0.5rem; border-radius: 6px; margin-left: 0.5rem; }
         
-        .sub-goal-box { margin-top: 1.25rem; padding-left: 1.25rem; border-left: 3px dashed #cbd5e1; }
+        .sub-goal-box { margin-top: 1.25rem; padding-left: 1.25rem; border-left: 3px dashed var(--border); }
         .sub-goal-list { list-style: none; display: flex; flex-direction: column; gap: 0.65rem; margin-top: 0.5rem; margin-bottom: 1.25rem; }
         
-        .sub-goal-item { 
-            display: flex; justify-content: space-between; align-items: center; 
-            background: #f8fafc; padding: 0.85rem 1rem; border-radius: 10px; font-size: 1.05rem; border: 1px solid #f1f5f9;
-        }
-        .sub-goal-item.completed { background: #e8f5e9; text-decoration: line-through; color: var(--text-muted); border-color: #d1e7dd; }
+        .sub-goal-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg); padding: 0.85rem 1rem; border-radius: 10px; font-size: 1.05rem; border: 1px solid var(--border); }
+        .sub-goal-item.completed { background: rgba(34, 197, 94, 0.1); text-decoration: line-through; color: var(--text-muted); }
         .sub-goal-left { display: flex; align-items: center; gap: 0.75rem; width: 85%; }
         .sub-goal-left input[type="checkbox"] { width: 1.2rem; height: 1.2rem; accent-color: #22c55e; }
         
-        .sub-input-container { background: #f1f5f9; padding: 1rem; border-radius: 12px; display: flex; flex-direction: column; gap: 0.75rem; }
+        .sub-input-container { background: var(--dashboard-bg); padding: 1rem; border-radius: 12px; display: flex; flex-direction: column; gap: 0.75rem; }
         .sub-input-row { display: flex; gap: 0.5rem; }
         .sub-input-container input[type="text"] { padding: 0.75rem; font-size: 1rem; border-radius: 8px; border: 1px solid var(--border); }
         .sub-input-container input[type="date"] { padding: 0.75rem; font-size: 1rem; border-radius: 8px; border: 1px solid var(--border); width: 150px; }
@@ -170,7 +141,6 @@
         .icon-btn.del-btn { color: #94a3b8; font-size: 1.1rem; }
         .icon-btn.del-btn:hover { color: #ef4444; }
         
-        /* 하단 액션 버튼 피드용 */
         .feed-action-links { display: flex; gap: 0.75rem; font-size: 0.9rem; font-weight: 500; color: var(--primary); cursor: pointer; }
         .feed-action-links span:hover { text-decoration: underline; }
         .actions { display: flex; gap: 0.5rem; align-items: center; }
@@ -180,13 +150,48 @@
 </head>
 <body>
 
+    <div id="lock-screen" class="hidden">
+        <div class="pin-box">
+            <h2 style="margin-bottom:0.5rem;">🔒 보안 잠금</h2>
+            <p style="font-size:0.9rem; opacity:0.8;">비밀번호 4자리를 입력하세요.</p>
+            <input type="password" id="pinInput" class="pin-input" maxlength="4" onkeyup="checkPin(this)">
+            <p id="lockError" style="color:#ef4444; font-size:0.85rem; font-weight:700;"></p>
+            <button onclick="setupNewPin()" style="background:none; border:none; color:white; font-size:0.8rem; text-decoration:underline; cursor:pointer; margin-top:1rem;">비밀번호 재설정(쿠키초기화)</button>
+        </div>
+    </div>
+
     <header>
         <div class="header-container">
             <h1>나의 라이프 아카이브</h1>
         </div>
     </header>
 
+    <div class="util-bar">
+        <div class="util-left">
+            <button class="util-btn" onclick="exportData()">💾 백업 받기</button>
+            <button class="util-btn" onclick="document.getElementById('importFile').click()">📂 복구하기</button>
+            <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(this)">
+        </div>
+        <button class="util-btn" id="themeToggleBtn" onclick="toggleTheme()">🌙 다크 모드</button>
+    </div>
+
     <main class="container">
+        
+        <div class="dashboard">
+            <div class="dash-card">
+                <div class="dash-title">🎯 목표 달성률</div>
+                <div class="dash-val" id="dashGoalStat">0% (0/0)</div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="dashGoalBar"></div>
+                </div>
+            </div>
+            <div class="dash-card">
+                <div class="dash-title">📝 축적된 생각 피드</div>
+                <div class="dash-val" id="dashFeedStat">총 0개</div>
+                <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.4rem;" id="dashFeedSubStat">기억: 0 | 잡생각: 0</div>
+            </div>
+        </div>
+
         <div class="tab-menu">
             <button class="tab-btn active" id="tab-goal" onclick="switchTab('goal-tab')">🎯 목표 관리</button>
             <button class="tab-btn" id="tab-feed" onclick="switchTab('feed-tab')">📝 일상 기록</button>
@@ -248,18 +253,140 @@
     </main>
 
     <script>
-        let editingFeedId = null; // 수정 중인 피드 ID 저장 변수
+        let editingFeedId = null;
 
         window.onload = function() {
+            initTheme(); // 🌓 다크모드 확인
+            initLock();  // 🔒 보안 확인
             document.getElementById('mainGoalDate').value = new Date().toISOString().substring(0, 10);
             renderGoals();
             renderFeeds();
+            updateDashboard(); // 📊 통계 업데이트
         };
 
+        /* ----------------------------------------------------
+           [기능 4] 🔒 PIN 번호 암호화 잠금 시스템
+        ---------------------------------------------------- */
+        function initLock() {
+            let pin = localStorage.getItem('archive_pin');
+            if(!pin) {
+                let userPin = prompt("💡 사용할 4자리 비밀번호를 신규 설정하세요:");
+                if(!userPin || userPin.length !== 4 || isNaN(userPin)) {
+                    alert("잘못된 입력입니다. 기본 비밀번호 '0000'으로 설정됩니다.");
+                    localStorage.setItem('archive_pin', '0000');
+                } else {
+                    localStorage.setItem('archive_pin', userPin);
+                }
+            }
+            document.getElementById('lock-screen').classList.remove('hidden');
+            document.getElementById('pinInput').focus();
+        }
+
+        function checkPin(input) {
+            let realPin = localStorage.getItem('archive_pin');
+            if(input.value.length === 4) {
+                if(input.value === realPin) {
+                    document.getElementById('lock-screen').classList.add('hidden');
+                    input.value = '';
+                    document.getElementById('lockError').innerText = '';
+                } else {
+                    document.getElementById('lockError').innerText = '❌ 비밀번호가 틀렸습니다.';
+                    input.value = '';
+                }
+            }
+        }
+
+        function setupNewPin() {
+            if(confirm('비밀번호를 재설정하시겠습니까? 데이터는 유지됩니다.')) {
+                let p = prompt('새로운 비밀번호 4자리를 지정하세요:');
+                if(p && p.length === 4) { localStorage.setItem('archive_pin', p); alert('변경 완료'); }
+            }
+        }
+
+        /* ----------------------------------------------------
+           [기능 1] 🌓 테마 전환 시스템 (다크모드)
+        ---------------------------------------------------- */
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            const btn = document.getElementById('themeToggleBtn');
+            btn.innerText = savedTheme === 'dark' ? '☀️ 라이트 모드' : '🌙 다크 모드';
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            document.getElementById('themeToggleBtn').innerText = newTheme === 'dark' ? '☀️ 라이트 모드' : '🌙 다크 모드';
+        }
+
+        /* ----------------------------------------------------
+           [기능 3] 💾 전체 데이터 JSON 파일 백업 및 원터치 복구
+        ---------------------------------------------------- */
+        function exportData() {
+            const backupData = {
+                goals: localStorage.getItem('goals_tree'),
+                feeds: localStorage.getItem('personal_feeds'),
+                pin: localStorage.getItem('archive_pin')
+            };
+            const blob = new Blob([JSON.stringify(backupData)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `라이프아카이브_백업_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+        }
+
+        function importData(input) {
+            const file = input.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if(imported.goals) localStorage.setItem('goals_tree', imported.goals);
+                    if(imported.feeds) localStorage.setItem('personal_feeds', imported.feeds);
+                    if(imported.pin) localStorage.setItem('archive_pin', imported.pin);
+                    alert('🎉 데이터가 성공적으로 완벽 복구되었습니다! 페이지를 새로고침합니다.');
+                    location.reload();
+                } catch(err) {
+                    alert('❌ 유효하지 않은 백업 파일입니다.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        /* ----------------------------------------------------
+           [기능 2] 📊 대시보드 통계 실시간 계산 엔진
+        ---------------------------------------------------- */
+        function updateDashboard() {
+            const goals = getData('goals_tree');
+            let totalGoals = goals.length;
+            let completedGoals = goals.filter(g => g.completed).length;
+
+            goals.forEach(g => {
+                totalGoals += g.subGoals.length;
+                completedGoals += g.subGoals.filter(s => s.completed).length;
+            });
+
+            const percent = totalGoals === 0 ? 0 : Math.round((completedGoals / totalGoals) * 100);
+            document.getElementById('dashGoalStat').innerText = `${percent}% (${completedGoals}/${totalGoals} 개)`;
+            document.getElementById('dashGoalBar').style.width = `${percent}%`;
+
+            const feeds = getData('personal_feeds');
+            document.getElementById('dashFeedStat').innerText = `총 ${feeds.length}개`;
+            
+            let c1 = feeds.filter(f => f.category === '기억').length;
+            let c2 = feeds.filter(f => f.category === '잡생각').length;
+            let c3 = feeds.filter(f => f.category === '하고싶은것').length;
+            document.getElementById('dashFeedSubStat').innerText = `✨기억: ${c1} | 💭잡생각: ${c2} | 💡워너비: ${c3}`;
+        }
+
+        /* [ 탭 전환 프로토콜 ] */
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            
             document.getElementById(tabId).classList.remove('hidden');
             if(tabId === 'goal-tab') document.getElementById('tab-goal').classList.add('active');
             if(tabId === 'feed-tab') document.getElementById('tab-feed').classList.add('active');
@@ -268,17 +395,17 @@
         function getData(key) { return JSON.parse(localStorage.getItem(key)) || []; }
         function saveData(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
 
-        /* [ 목표 엔진 시스템 ] */
+        /* [ 목표 제어 아키텍처 ] */
         function addMainGoal() {
             const txt = document.getElementById('mainGoalInput').value.trim();
             const date = document.getElementById('mainGoalDate').value;
             if(!txt) return alert('목표 내용을 입력해주세요.');
-
             const goals = getData('goals_tree');
             goals.push({ id: Date.now(), text: txt, deadline: date, completed: false, subGoals: [] });
             saveData('goals_tree', goals);
             document.getElementById('mainGoalInput').value = '';
             renderGoals();
+            updateDashboard();
         }
 
         function addSubGoal(mainId) {
@@ -286,14 +413,14 @@
             const dateInput = document.getElementById(`subDate-${mainId}`);
             const txt = txtInput.value.trim();
             const date = dateInput.value;
-            if(!txt) return alert('하위 목표 내용을 입력해주세요.');
-
+            if(!txt) return alert('하위 목표를 입력하세요.');
             const goals = getData('goals_tree');
             const mainGoal = goals.find(g => g.id === mainId);
             if(mainGoal) {
                 mainGoal.subGoals.push({ id: Date.now(), text: txt, deadline: date, completed: false });
                 saveData('goals_tree', goals);
                 renderGoals();
+                updateDashboard();
             }
         }
 
@@ -305,6 +432,7 @@
                 if(goal.completed) goal.subGoals.forEach(s => s.completed = true);
                 saveData('goals_tree', goals);
                 renderGoals();
+                updateDashboard();
             }
         }
 
@@ -316,6 +444,7 @@
                 if(subGoal) subGoal.completed = !subGoal.completed;
                 saveData('goals_tree', goals);
                 renderGoals();
+                updateDashboard();
             }
         }
 
@@ -325,6 +454,7 @@
             goals = goals.filter(g => g.id !== id);
             saveData('goals_tree', goals);
             renderGoals();
+            updateDashboard();
         }
 
         function deleteSubGoal(mainId, subId) {
@@ -334,6 +464,7 @@
                 mainGoal.subGoals = mainGoal.subGoals.filter(s => s.id !== subId);
                 saveData('goals_tree', goals);
                 renderGoals();
+                updateDashboard();
             }
         }
 
@@ -342,17 +473,6 @@
             container.innerHTML = '';
             const goals = getData('goals_tree');
             const hideCompleted = document.getElementById('hideCompletedGoals').checked;
-
-            if (goals.length === 0) {
-                // 초기 디폴트 구조 유지
-                goals.push({
-                    id: 111, text: "변리사 시험 최종 합격 준비", deadline: "2028-07-31", completed: false,
-                    subGoals: [
-                        { id: 222, text: "목표 토익 점수 완성하기 (영어 스펙 확보)", deadline: "2026-10-31", completed: false },
-                        { id: 333, text: "기본 법학 및 선택과목 이론 인강 1회독 완료", deadline: "2027-02-28", completed: false }
-                    ]
-                });
-            }
 
             goals.forEach(main => {
                 if(hideCompleted && main.completed) return;
@@ -387,7 +507,7 @@
                             <input type="text" id="subTxt-${main.id}" placeholder="세부 행동 계획 입력...">
                             <div class="sub-input-row">
                                 <input type="date" id="subDate-${main.id}" value="${main.deadline}">
-                                <button style="flex:1;" onclick="addSubGoal(${main.id})">하위 목표 추가</button>
+                                <button style="flex:1;" onclick="addSubGoal(${main.id})">하위 추가</button>
                             </div>
                         </div>
                     </div>
@@ -396,18 +516,16 @@
             });
         }
 
-        /* [ 일상 기록 피드 엔진 - ✏️ 수정 시스템 통합 구현 ] */
+        /* [ 일상 피드 데이터 코어 엔진 ] */
         function addFeedItem() {
             const title = document.getElementById('feedTitle').value.trim();
             const category = document.getElementById('feedCategory').value;
             const content = document.getElementById('feedContent').value.trim();
-
             if(!content) return alert('기록할 내용을 입력해주세요.');
 
             const feeds = getData('personal_feeds');
 
             if (editingFeedId) {
-                // 데이터 수정 로직 가동 (기존 데이터 완벽 보존)
                 const index = feeds.findIndex(f => f.id === editingFeedId);
                 if (index !== -1) {
                     feeds[index].category = category;
@@ -416,27 +534,17 @@
                 }
                 editingFeedId = null;
             } else {
-                // 신규 등록 로직
                 const now = new Date();
                 const timeString = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-                
-                feeds.unshift({
-                    id: Date.now(),
-                    title: title || `${category} 기록`,
-                    category: category,
-                    content: content,
-                    datetime: timeString,
-                    starred: false
-                });
+                feeds.unshift({ id: Date.now(), title: title || `${category} 기록`, category: category, content: content, datetime: timeString, starred: false });
             }
 
             saveData('personal_feeds', feeds);
             resetFeedForm();
             renderFeeds();
-            alert('기록 데이터가 안전하게 저장되었습니다!');
+            updateDashboard();
         }
 
-        // 피드 수정 전조 작업
         function startEditFeed(id) {
             const feeds = getData('personal_feeds');
             const item = feeds.find(f => f.id === id);
@@ -447,11 +555,8 @@
             document.getElementById('feedCategory').value = item.category;
             document.getElementById('feedTitle').value = item.title.includes('기록') && item.title.length < 8 ? '' : item.title;
             document.getElementById('feedContent').value = item.content;
-
             document.getElementById('feedSubmitBtn').innerText = "수정 완료하기 ✔️";
             document.getElementById('feedCancelBtn').classList.remove('hidden');
-            
-            // 입력창 최상단으로 스무스 스크롤 이동
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
@@ -467,34 +572,24 @@
         function toggleStar(id) {
             const feeds = getData('personal_feeds');
             const item = feeds.find(f => f.id === id);
-            if(item) { item.starred = !item.starred; saveData('personal_feeds', feeds); renderFeeds(); }
+            if(item) { typeof item.starred === 'undefined' ? item.starred = true : item.starred = !item.starred; saveData('personal_feeds', feeds); renderFeeds(); }
         }
 
         function deleteFeedItem(id) {
-            if(!confirm('이 기록을 영구 삭제할까요?')) return;
+            if(!confirm('이 기록을 삭제할까요?')) return;
             let feeds = getData('personal_feeds');
             feeds = feeds.filter(f => f.id !== id);
             saveData('personal_feeds', feeds);
             renderFeeds();
+            updateDashboard();
         }
 
         function renderFeeds() {
             const container = document.getElementById('feedContainer');
             container.innerHTML = '';
-            
             const feeds = getData('personal_feeds');
             const categoryFilter = document.getElementById('categoryFilter').value;
             const starFilter = document.getElementById('starFilter').checked;
-
-            // 저장된 초기값이 아예 없는 경우 예시 생성 가이드
-            if(feeds.length === 0) {
-                feeds.push(
-                    { id: 1, title: "하고싶은것 기록", category: "하고싶은것", content: "휴가때 스키장", datetime: "2026-05-22 14:41", starred: false },
-                    { id: 2, title: "하고싶은것 기록", category: "하고싶은것", content: "한탄강 래프팅", datetime: "2026-05-22 14:41", starred: false },
-                    { id: 3, title: "기억 기록", category: "기억", content: "일본 여행에서 호텔 온천탕 에서 온천을 즐겼던 추억", datetime: "2026-05-21 18:54", starred: true }
-                );
-                saveData('personal_feeds', feeds);
-            }
 
             feeds.forEach(item => {
                 if(categoryFilter !== '전체' && item.category !== categoryFilter) return;
@@ -516,9 +611,7 @@
                     <div class="feed-body">${item.content}</div>
                     <div class="feed-meta">
                         <span>🕒 ${item.datetime}</span>
-                        <div class="feed-action-links">
-                            <span onclick="startEditFeed(${item.id})">수정 ✏️</span>
-                        </div>
+                        <div class="feed-action-links"><span onclick="startEditFeed(${item.id})">수정 ✏️</span></div>
                     </div>
                 `;
                 container.appendChild(div);
